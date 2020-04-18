@@ -1,7 +1,7 @@
 {
   "name": "death_gl",
   "version": "0.0.1",
-  "description": "",
+  "description": "artecerca",
   "main": "src/index.js",
   "scripts": {
     "start": "concurrently \"nodemon server.js\" \"watchify src/index.js -o public/js/bundle.js -v\"",
@@ -29,7 +29,7 @@
     "glslify": "^6.1.0",
     "nodemon": "^1.14.12",
     "uglify-js": "^3.3.9",
-    "watchify": "^3.10.0"
+    "watchify": "^3.11.1"
   },
   "browserify": {
     "transform": [
@@ -43,5 +43,13 @@
       ],
       "glslify"
     ]
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/omarolaes/artecerca.git"
+  },
+  "bugs": {
+    "url": "https://github.com/omarolaes/artecerca/issues"
+  },
+  "homepage": "https://github.com/omarolaes/artecerca#readme"
 }
