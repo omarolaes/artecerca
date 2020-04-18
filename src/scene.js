@@ -20,39 +20,33 @@ class Scene extends EventEmitter {
     //THREE scene
     this.scene = new THREE.Scene();
     /*
-    var fogColor = new THREE.Color(0xffffff);
+    var fogColor = new THREE.Color(0xFAFAFA);
     this.scene.background = fogColor;
     this.scene.fog = new THREE.Fog(fogColor, 0.0025, 20);
     */
-   
-  let bgMesh;
-  {
-    const loader = new THREE.TextureLoader();
-    const texture = loader.load(
-      'http://localhost:3000/fondo.jpg',
-    );
-    texture.magFilter = THREE.LinearFilter;
-    texture.minFilter = THREE.LinearFilter;
 
-    const shader = THREE.ShaderLib.equirect;
-		const material = new THREE.ShaderMaterial({
-      fragmentShader: shader.fragmentShader,
-      vertexShader: shader.vertexShader,
-      uniforms: shader.uniforms,
-      depthWrite: false,
-      side: THREE.BackSide,
-    });
-		material.uniforms.tEquirect.value = texture;
-    const plane = new THREE.BoxBufferGeometry(500, 500, 500);
-    bgMesh = new THREE.Mesh(plane, material);
-    this.scene.add(bgMesh);
-  }
+    let bgMesh; {
+      const loader = new THREE.TextureLoader();
+      const texture = loader.load(
+        'http://localhost:3000/fondo.jpg',
+      );
+      texture.magFilter = THREE.LinearFilter;
+      texture.minFilter = THREE.LinearFilter;
 
-   
+      const shader = THREE.ShaderLib.equirect;
+      const material = new THREE.ShaderMaterial({
+        fragmentShader: shader.fragmentShader,
+        vertexShader: shader.vertexShader,
+        uniforms: shader.uniforms,
+        depthWrite: false,
+        side: THREE.BackSide,
+      });
+      material.uniforms.tEquirect.value = texture;
+      const plane = new THREE.BoxBufferGeometry(500, 500, 500);
+      bgMesh = new THREE.Mesh(plane, material);
+      this.scene.add(bgMesh);
+    }
 
-
-
-    
 
     this.width = _width;
     this.height = _height;
@@ -81,84 +75,123 @@ class Scene extends EventEmitter {
     domElement.addEventListener('mouseleave', e => this.onLeaveCanvas(e), false);
     window.addEventListener('keydown', e => this.onKeyDown(e), false);
 
-/*
-    this.helperGrid = new THREE.GridHelper(100, 100);
-    this.helperGrid.position.y = -0.5;
-    this.scene.add(this.helperGrid);
-    var geometry = new THREE.BoxGeometry(10, 10, 10);
-    var material = new THREE.MeshBasicMaterial({
-      color: 0xf0f0f0,
+    /*
+        this.helperGrid = new THREE.GridHelper(100, 100);
+        this.helperGrid.position.y = -0.5;
+        this.scene.add(this.helperGrid);
+        var geometry = new THREE.BoxGeometry(10, 10, 10);
+        var material = new THREE.MeshBasicMaterial({
+          color: 0xFAFAFA,
+          side: THREE.DoubleSide
+        });
+        var cube = new THREE.Mesh(geometry, material);
+        cube.position.y = 5;
+        this.scene.add(cube);
+        
+    */
+
+
+
+    this.worldLight = new THREE.AmbientLight(0xe0e0e0);
+    this.scene.add(this.worldLight);
+
+
+
+
+
+
+// artwork 
+
+
+var imagen1 = new THREE.TextureLoader().load('http://localhost:3000/art/art1.png');
+this.artmat1 = new THREE.MeshBasicMaterial({
+  map: imagen1,
+  side: THREE.DoubleSide
+});
+this.arte1 = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), this.artmat1);
+this.arte1.position.z = 0;
+this.arte1.position.y = 1;
+this.arte1.position.x = 4.95;
+
+this.scene.add(this.arte1);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //Create the walls////
+    this.wallGroup = new THREE.Group();
+    this.scene.add(this.wallGroup);
+
+    this.wall1 = new THREE.Mesh(new THREE.BoxGeometry(10, 5, 1), new THREE.MeshLambertMaterial({
+      color: 0xFAFAFA
+    }));
+    this.wall2 = new THREE.Mesh(new THREE.BoxGeometry(10, 5, 1), new THREE.MeshLambertMaterial({
+      color: 0xFAFAFA
+    }));
+    this.wall3 = new THREE.Mesh(new THREE.BoxGeometry(7, 5, 1), new THREE.MeshLambertMaterial({
+      color: 0xFAFAFA
+    }));
+    this.wall4 = new THREE.Mesh(new THREE.BoxGeometry(10, 5, 1), new THREE.MeshLambertMaterial({
+      color: 0xFAFAFA
+    }));
+
+    this.wallGroup.add(this.wall1, this.wall2, this.wall3, this.wall4);
+    this.wallGroup.position.y = 0;
+    this.wall1.position.z = -5;
+    this.wall2.position.x = -5;
+    this.wall2.rotation.y = Math.PI / 2;
+    this.wall3.position.x = 5;
+    this.wall3.rotation.y = -Math.PI / 2;
+    this.wall4.position.z = 5;
+    this.wall4.rotation.y = Math.PI;
+
+    for (var i = 0; i < this.wallGroup.children.length; i++) {
+      this.wallGroup.children[i].BBox = new THREE.Box3();
+      this.wallGroup.children[i].BBox.setFromObject(this.wallGroup.children[i]);
+    }
+
+    //Ceiling//
+    //this.ceilMaterial = new THREE.MeshLambertMaterial({color: 0x8DB8A7});
+    this.ceilMaterial = new THREE.MeshLambertMaterial({
+      color: 0xe0e0e0
+    });
+    this.ceil = new THREE.Mesh(new THREE.PlaneGeometry(10, 10), this.ceilMaterial);
+    this.ceil.position.y = 2.5;
+    this.ceil.rotation.x = Math.PI / 2;
+
+    this.scene.add(this.ceil);
+
+
+
+    var txture = new THREE.TextureLoader().load('http://localhost:3000/darkwood.jpg', function (txture) {
+      txture.wrapS = THREE.RepeatWrapping;
+      txture.wrapT = THREE.RepeatWrapping;
+      txture.repeat.x = 50;
+      txture.repeat.y = 50;
+    });
+    this.floorMaterial = new THREE.MeshBasicMaterial({
+      map: txture,
       side: THREE.DoubleSide
     });
-    var cube = new THREE.Mesh(geometry, material);
-    cube.position.y = 5;
-    this.scene.add(cube);
-    
-*/
+    /* this.floorMaterial = new THREE.MeshLambertMaterial({
+      color: 0x202020
+    }); */
+    this.folor = new THREE.Mesh(new THREE.BoxGeometry(22, 22, 1), this.floorMaterial);
+    this.folor.position.y = -1;
+    this.folor.rotation.x = Math.PI / 2;
 
-
-
-this.worldLight = new THREE.AmbientLight(0xe0e0e0);
-this.scene.add(this.worldLight);
-
-
-			//Create the walls////
-			this.wallGroup = new THREE.Group();
-			this.scene.add(this.wallGroup);
-
-			this.wall1 = new THREE.Mesh(new THREE.BoxGeometry(20,7, 2), new THREE.MeshLambertMaterial({color: 0xf0f0f0}));
-			this.wall2 = new THREE.Mesh(new THREE.BoxGeometry(7,7, 2), new THREE.MeshLambertMaterial({color: 0xf0f0f0}));
-			this.wall3 = new THREE.Mesh(new THREE.BoxGeometry(10,7, 1), new THREE.MeshLambertMaterial({color: 0xf0f0f0}));
-			this.wall4 = new THREE.Mesh(new THREE.BoxGeometry(20,7, 1), new THREE.MeshLambertMaterial({color: 0xf0f0f0}));
-
-			this.wallGroup.add(this.wall1, this.wall2, this.wall3, this.wall4);
-			this.wallGroup.position.y = 3;
-
-			this.wall1.position.z = -10;
-			this.wall2.position.x = -10;
-			this.wall2.rotation.y = Math.PI/2;
-			this.wall3.position.x = 10;
-			this.wall3.rotation.y = -Math.PI/2;
-			this.wall4.position.z = 10;
-			this.wall4.rotation.y = Math.PI;
-
-            for(var i = 0; i < this.wallGroup.children.length; i++) {
-                this.wallGroup.children[i].BBox = new THREE.Box3();
-                this.wallGroup.children[i].BBox.setFromObject(this.wallGroup.children[i]);
-            }
-
-			//Ceiling//
-			//this.ceilMaterial = new THREE.MeshLambertMaterial({color: 0x8DB8A7});
-      this.ceilMaterial = new THREE.MeshLambertMaterial({
-        color: 0xe0e0e0
-      });
-			this.ceil = new THREE.Mesh(new THREE.PlaneGeometry(20,20), this.ceilMaterial);
-			this.ceil.position.y = 6;
-			this.ceil.rotation.x = Math.PI/2;
-
-			this.scene.add(this.ceil);
-
-
-      this.floorMaterial = new THREE.MeshLambertMaterial({
-        color: 0x202020
-      });
-			this.folor = new THREE.Mesh(new THREE.BoxGeometry(22,22,1), this.floorMaterial);
-			this.folor.position.y = -1;
-			this.folor.rotation.x = Math.PI/2;
-
-			this.scene.add(this.folor);
-
-
-
-
-
-
-
-
-
-
-
-
+    this.scene.add(this.folor);
 
 
 

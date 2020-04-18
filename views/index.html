@@ -1,13 +1,16 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-
-	<title>
-		Three.js Multiplayer Client
-	</title>
-
-	<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Near.Gallery/fin_del_mundo</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css"
+        integrity="sha256-h20CPZ0QyXlBuAw7A+KluUYx/3pK+c7lYEpqLTlxjYQ=" crossorigin="anonymous" />
+    <meta name="msapplication-TileColor" content="#FAFAFA">
+    <meta name="theme-color" content="#3B0DA0">
+<link rel="shortcut icon" href="http://localhost:3000/favicon.png" type="image/x-icon">
 	<!--Scoket.io-->
 	<script src="js/socket.io.js"></script>
 
@@ -17,6 +20,50 @@
 </head>
 <body>
 
+<style>
+body{
+	background: #3B0DA0;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+}
+*{
+	box-sizing: border-box;
+}
+.first_texto{
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    z-index: 9;
+    font-size: 12px;
+    background: gainsboro;
+    line-height: 1;
+    padding: 0.5vw 1vw;
+}
+.first_texto h1{
+	font-size: 12px;
+	margin: 0;
+}
+.first_texto p{
+	font-size: 10px;
+	margin: 0;
+}
+canvas{
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+</style>
+
+<div class="first_texto">
+<h1>Virtual Art Gallery</h1>
+<p>Assist to exhibition openings from home.</p>
+<p><i class="far fa-keyboard"></i> Use arrow keys to move.</p>
+</div>
 <!-- WebGL context -->
 <div id="gl_context"></div>
 

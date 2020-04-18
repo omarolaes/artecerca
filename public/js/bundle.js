@@ -46565,8 +46565,8 @@ glScene.on('userMoved', function () {
 //On connection server sends the client his ID
 socket.on('introduction', function (_id, _clientNum, _ids) {
 
-  var geometry = new THREE.ConeBufferGeometry(1, 1, 10);
-  var material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+  var geometry = new THREE.SphereBufferGeometry(0.1, 5, 5);
+  var material = new THREE.MeshNormalMaterial();
 
   for (var i = 0; i < _ids.length; i++) {
     if (_ids[i] != _id) {
@@ -46594,9 +46594,11 @@ socket.on('newUserConnected', function (clientCount, _id, _ids) {
     }
   }
   if (_id != id && !alreadyHasUser) {
+    var geometry = new THREE.SphereBufferGeometry(0.1, 5, 5);
+    var material = new THREE.MeshNormalMaterial();
     console.log('Nuevo: ' + _id);
     clients[_id] = {
-      mesh: new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshNormalMaterial())
+      mesh: new THREE.Mesh(geometry, material)
 
       //Add initial users to the scene
     };glScene.scene.add(clients[_id].mesh);
@@ -46698,13 +46700,12 @@ var Scene = function (_EventEmitter) {
 
     _this.scene = new THREE.Scene();
     /*
-    var fogColor = new THREE.Color(0xffffff);
+    var fogColor = new THREE.Color(0xFAFAFA);
     this.scene.background = fogColor;
     this.scene.fog = new THREE.Fog(fogColor, 0.0025, 20);
     */
 
-    var bgMesh = void 0;
-    {
+    var bgMesh = void 0;{
       var loader = new THREE.TextureLoader();
       var texture = loader.load('http://localhost:3000/fondo.jpg');
       texture.magFilter = THREE.LinearFilter;
@@ -46765,7 +46766,7 @@ var Scene = function (_EventEmitter) {
         this.scene.add(this.helperGrid);
         var geometry = new THREE.BoxGeometry(10, 10, 10);
         var material = new THREE.MeshBasicMaterial({
-          color: 0xf0f0f0,
+          color: 0xFAFAFA,
           side: THREE.DoubleSide
         });
         var cube = new THREE.Mesh(geometry, material);
@@ -46777,24 +46778,46 @@ var Scene = function (_EventEmitter) {
     _this.worldLight = new THREE.AmbientLight(0xe0e0e0);
     _this.scene.add(_this.worldLight);
 
+    // artwork 
+
+
+    var imagen1 = new THREE.TextureLoader().load('http://localhost:3000/art/art1.png');
+    _this.artmat1 = new THREE.MeshBasicMaterial({
+      map: imagen1,
+      side: THREE.DoubleSide
+    });
+    _this.arte1 = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), _this.artmat1);
+    _this.arte1.position.z = 0;
+    _this.arte1.position.y = 1;
+    _this.arte1.position.x = 4.95;
+
+    _this.scene.add(_this.arte1);
+
     //Create the walls////
     _this.wallGroup = new THREE.Group();
     _this.scene.add(_this.wallGroup);
 
-    _this.wall1 = new THREE.Mesh(new THREE.BoxGeometry(20, 7, 2), new THREE.MeshLambertMaterial({ color: 0xf0f0f0 }));
-    _this.wall2 = new THREE.Mesh(new THREE.BoxGeometry(7, 7, 2), new THREE.MeshLambertMaterial({ color: 0xf0f0f0 }));
-    _this.wall3 = new THREE.Mesh(new THREE.BoxGeometry(10, 7, 1), new THREE.MeshLambertMaterial({ color: 0xf0f0f0 }));
-    _this.wall4 = new THREE.Mesh(new THREE.BoxGeometry(20, 7, 1), new THREE.MeshLambertMaterial({ color: 0xf0f0f0 }));
+    _this.wall1 = new THREE.Mesh(new THREE.BoxGeometry(10, 5, 1), new THREE.MeshLambertMaterial({
+      color: 0xFAFAFA
+    }));
+    _this.wall2 = new THREE.Mesh(new THREE.BoxGeometry(10, 5, 1), new THREE.MeshLambertMaterial({
+      color: 0xFAFAFA
+    }));
+    _this.wall3 = new THREE.Mesh(new THREE.BoxGeometry(7, 5, 1), new THREE.MeshLambertMaterial({
+      color: 0xFAFAFA
+    }));
+    _this.wall4 = new THREE.Mesh(new THREE.BoxGeometry(10, 5, 1), new THREE.MeshLambertMaterial({
+      color: 0xFAFAFA
+    }));
 
     _this.wallGroup.add(_this.wall1, _this.wall2, _this.wall3, _this.wall4);
-    _this.wallGroup.position.y = 3;
-
-    _this.wall1.position.z = -10;
-    _this.wall2.position.x = -10;
+    _this.wallGroup.position.y = 0;
+    _this.wall1.position.z = -5;
+    _this.wall2.position.x = -5;
     _this.wall2.rotation.y = Math.PI / 2;
-    _this.wall3.position.x = 10;
+    _this.wall3.position.x = 5;
     _this.wall3.rotation.y = -Math.PI / 2;
-    _this.wall4.position.z = 10;
+    _this.wall4.position.z = 5;
     _this.wall4.rotation.y = Math.PI;
 
     for (var i = 0; i < _this.wallGroup.children.length; i++) {
@@ -46807,15 +46830,25 @@ var Scene = function (_EventEmitter) {
     _this.ceilMaterial = new THREE.MeshLambertMaterial({
       color: 0xe0e0e0
     });
-    _this.ceil = new THREE.Mesh(new THREE.PlaneGeometry(20, 20), _this.ceilMaterial);
-    _this.ceil.position.y = 6;
+    _this.ceil = new THREE.Mesh(new THREE.PlaneGeometry(10, 10), _this.ceilMaterial);
+    _this.ceil.position.y = 2.5;
     _this.ceil.rotation.x = Math.PI / 2;
 
     _this.scene.add(_this.ceil);
 
-    _this.floorMaterial = new THREE.MeshLambertMaterial({
-      color: 0x202020
+    var txture = new THREE.TextureLoader().load('http://localhost:3000/darkwood.jpg', function (txture) {
+      txture.wrapS = THREE.RepeatWrapping;
+      txture.wrapT = THREE.RepeatWrapping;
+      txture.repeat.x = 50;
+      txture.repeat.y = 50;
     });
+    _this.floorMaterial = new THREE.MeshBasicMaterial({
+      map: txture,
+      side: THREE.DoubleSide
+    });
+    /* this.floorMaterial = new THREE.MeshLambertMaterial({
+      color: 0x202020
+    }); */
     _this.folor = new THREE.Mesh(new THREE.BoxGeometry(22, 22, 1), _this.floorMaterial);
     _this.folor.position.y = -1;
     _this.folor.rotation.x = Math.PI / 2;
