@@ -46565,10 +46565,13 @@ glScene.on('userMoved', function () {
 //On connection server sends the client his ID
 socket.on('introduction', function (_id, _clientNum, _ids) {
 
+  var geometry = new THREE.ConeBufferGeometry(1, 1, 10);
+  var material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+
   for (var i = 0; i < _ids.length; i++) {
     if (_ids[i] != _id) {
       clients[_ids[i]] = {
-        mesh: new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshNormalMaterial())
+        mesh: new THREE.Mesh(geometry, material)
 
         //Add initial users to the scene
       };glScene.scene.add(clients[_ids[i]].mesh);
@@ -46578,11 +46581,11 @@ socket.on('introduction', function (_id, _clientNum, _ids) {
   console.log(clients);
 
   id = _id;
-  console.log('My ID is: ' + id);
+  console.log('mi usuario: ' + id);
 });
 
 socket.on('newUserConnected', function (clientCount, _id, _ids) {
-  console.log(clientCount + ' clients connected');
+  console.log(clientCount + ' personas conectadas');
   var alreadyHasUser = false;
   for (var i = 0; i < Object.keys(clients).length; i++) {
     if (Object.keys(clients)[i] == _id) {
@@ -46591,7 +46594,7 @@ socket.on('newUserConnected', function (clientCount, _id, _ids) {
     }
   }
   if (_id != id && !alreadyHasUser) {
-    console.log('A new user connected with the id: ' + _id);
+    console.log('Nuevo: ' + _id);
     clients[_id] = {
       mesh: new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshNormalMaterial())
 
@@ -46605,7 +46608,7 @@ socket.on('userDisconnected', function (clientCount, _id, _ids) {
   document.getElementById('numUsers').textContent = clientCount;
 
   if (_id != id) {
-    console.log('A user disconnected with the id: ' + _id);
+    console.log('Se salió: ' + _id);
     glScene.scene.remove(clients[_id].mesh);
     delete clients[_id];
   }
@@ -46703,7 +46706,7 @@ var Scene = function (_EventEmitter) {
     var bgMesh = void 0;
     {
       var loader = new THREE.TextureLoader();
-      var texture = loader.load('https://i.imgur.com/l1jS8VN.jpg');
+      var texture = loader.load('http://localhost:3000/fondo.jpg');
       texture.magFilter = THREE.LinearFilter;
       texture.minFilter = THREE.LinearFilter;
 

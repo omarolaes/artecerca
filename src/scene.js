@@ -29,7 +29,7 @@ class Scene extends EventEmitter {
   {
     const loader = new THREE.TextureLoader();
     const texture = loader.load(
-      'https://i.imgur.com/l1jS8VN.jpg',
+      'http://localhost:3000/fondo.jpg',
     );
     texture.magFilter = THREE.LinearFilter;
     texture.minFilter = THREE.LinearFilter;
