@@ -14,7 +14,7 @@ const port = process.env.PORT || 3000;
 const server = app.listen(port);
 
 //Console the port
-console.log('Server is running localhost on port: ' + port );
+console.log('Port: ' + port );
 
 /////SOCKET.IO///////
 const io = require('socket.io').listen(server);
@@ -36,8 +36,13 @@ let clients = {}
 
 //Socket setup
 io.on('connection', client=>{
+  
 
-  console.log('User ' + client.id + ' connected, there are ' + io.engine.clientsCount + ' clients connected');
+  client.on('chat message', function(msg){
+    io.emit('chat message', msg);
+  });
+
+  console.log('User ' + client.id + ' se conectó, hay ' + io.engine.clientsCount + ' conectados');
 
   //Add a new client indexed by his id
   clients[client.id] = {
@@ -66,7 +71,7 @@ io.on('connection', client=>{
 
     io.sockets.emit('userDisconnected', io.engine.clientsCount, client.id, Object.keys(clients));
 
-    console.log('User ' + client.id + ' dissconeted, there are ' + io.engine.clientsCount + ' clients connected');
+    console.log('Usuario ' + client.id + ' se salió, hay ' + io.engine.clientsCount + ' conectados');
 
   });
 

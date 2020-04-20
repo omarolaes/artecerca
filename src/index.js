@@ -1,8 +1,11 @@
 import Scene from './scene';
 import * as THREE from 'three';
 
+
+
 //A socket.io instance
 const socket = io();
+
 
 //One WebGL context to rule them all !
 let glScene = new Scene();
@@ -13,6 +16,9 @@ let clients = new Object();
 glScene.on('userMoved', ()=>{
   socket.emit('move', [glScene.camera.position.x, glScene.camera.position.y, glScene.camera.position.z]);
 });
+
+
+
 
 //On connection server sends the client his ID
 socket.on('introduction', (_id, _clientNum, _ids)=>{

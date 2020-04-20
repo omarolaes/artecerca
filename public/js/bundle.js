@@ -46692,61 +46692,56 @@ var Scene = function (_EventEmitter) {
 
     _classCallCheck(this, Scene);
 
-    //THREE scene
     var _this = _possibleConstructorReturn(this, (Scene.__proto__ || Object.getPrototypeOf(Scene)).call(this));
-
     //Since we extend EventEmitter we need to instance it from here
 
 
     _this.scene = new THREE.Scene();
-    /*
+
+    /* Fog */
     var fogColor = new THREE.Color(0xFFFFFF);
-    this.scene.background = fogColor;
-    this.scene.fog = new THREE.Fog(fogColor, 0.0025, 20);
-    */
+    _this.scene.background = fogColor;
+    _this.scene.fog = new THREE.Fog(fogColor, 0.00025, 100);
 
-    var bgMesh = void 0;{
-      var loader = new THREE.TextureLoader();
-      var texture = loader.load('http://localhost:3000/fondo.jpg');
-      texture.magFilter = THREE.LinearFilter;
-      texture.minFilter = THREE.LinearFilter;
-
+    /* Skybox */
+    var Skybox = void 0;{
+      var loader_sky = new THREE.TextureLoader();
+      var texture_sky = loader_sky.load('http://localhost:3000/img/fondo.jpg');
+      texture_sky.magFilter = THREE.LinearFilter;
+      texture_sky.minFilter = THREE.LinearFilter;
       var shader = THREE.ShaderLib.equirect;
-      var material = new THREE.ShaderMaterial({
+      var material_sky = new THREE.ShaderMaterial({
         fragmentShader: shader.fragmentShader,
         vertexShader: shader.vertexShader,
         uniforms: shader.uniforms,
         depthWrite: false,
         side: THREE.BackSide
       });
-      material.uniforms.tEquirect.value = texture;
+      material_sky.uniforms.tEquirect.value = texture_sky;
       var plane = new THREE.BoxBufferGeometry(500, 500, 500);
-      bgMesh = new THREE.Mesh(plane, material);
-      _this.scene.add(bgMesh);
+      Skybox = new THREE.Mesh(plane, material_sky);
+      _this.scene.add(Skybox);
     }
 
     _this.width = _width;
     _this.height = _height;
     _this.camera = new THREE.PerspectiveCamera(50, _this.width / _this.height, 0.1, 1000);
-
     //THREE WebGL renderer
     _this.renderer = new THREE.WebGLRenderer({
       antialiasing: true
     });
-
     _this.renderer.setClearColor(new THREE.Color(clearColor));
-
     _this.renderer.setSize(_this.width, _this.height);
-
     //Push the canvas to the DOM
     domElement.append(_this.renderer.domElement);
 
+    /* Configure controls */
     if (hasControls) {
       _this.controls = new THREE.FirstPersonControls(_this.camera, _this.renderer.domElement);
-      _this.controls.lookSpeed = 0.05;
+      _this.controls.lookSpeed = 0.08;
     }
 
-    //Setup event listeners for events and handle the states
+    // Setup event listeners for events and handle the states
     window.addEventListener('resize', function (e) {
       return _this.onWindowResize(e);
     }, false);
@@ -46760,148 +46755,108 @@ var Scene = function (_EventEmitter) {
       return _this.onKeyDown(e);
     }, false);
 
-    _this.worldLight = new THREE.AmbientLight(0xEAEAEA);
+    // Ambient Light in Gray
+    _this.worldLight = new THREE.AmbientLight(0xf0f0f0);
     _this.scene.add(_this.worldLight);
 
-    // artwork 
-    // funcion to obtain ratio
+    // Room variables
+    var room_x = 10;
+    var room_z = 15;
+    var room_y = 8;
+
+    // Inserta cuadros
+    var artworks = ['http://localhost:3000/art/art1.png', 'http://localhost:3000/art/art2.png', 'http://localhost:3000/art/art3.png'];
+
+    var widthart = 2;
+    var heightart = 2;
+    var eye_seight = 0.5;
     var ratio = 1;
-    function getRatio(url, callback) {
-      var img = new Image();
-      img.src = url;
-      img.onload = function () {
-        callback(this.width, this.height);
-      };
+
+    for (var i = 0; i < 3; i++) {
+      var imagen1src = artworks[i];
+      var imagen1 = new THREE.TextureLoader().load(imagen1src, function (tex) {
+        ratio = tex.image.width / tex.image.height;
+        heightart = widthart * ratio;
+      });
+      _this.artmat1 = new THREE.MeshBasicMaterial({
+        map: imagen1
+      });
+      _this.arte1 = new THREE.Mesh(new THREE.BoxGeometry(0.05, heightart, widthart), _this.artmat1);
+      _this.arte1.position.z = room_z - 2.5;
+      _this.arte1.position.y = eye_seight;
+      _this.arte1.rotation.y = -Math.PI / 2;
+      _this.arte1.position.x = -room_x + (widthart + 0.5) * i;
+      _this.scene.add(_this.arte1);
+      // pleca de cuadro
+      var plecasrc = 'http://localhost:3000/art/pleca1.png';
+      var pleca = new THREE.TextureLoader().load(plecasrc);
+      _this.plecamat = new THREE.MeshBasicMaterial({
+        map: pleca
+      });
+      _this.pleca1 = new THREE.Mesh(new THREE.BoxGeometry(0.01, 0.1, 0.2), _this.plecamat);
+      _this.pleca1.position.z = room_z - 2.5;
+      _this.pleca1.position.y = eye_seight;
+      _this.pleca1.rotation.y = -Math.PI / 2;
+      _this.pleca1.position.x = -(room_x / 2) + (widthart + 0.5) * i;
+      _this.scene.add(_this.pleca1);
     }
+
+    // video cuadro
+    var videocuadro = document.getElementById('video');
+    var widthvideo = 5;
+    var heightvideo = 10;
+    var videotxt = new THREE.VideoTexture(video);
+    videotxt.minFilter = THREE.LinearFilter;
+    videotxt.magFilter = THREE.LinearFilter;
+    videotxt.format = THREE.RGBFormat;
+    _this.videomat = new THREE.MeshBasicMaterial({
+      map: videotxt,
+      side: THREE.DoubleSide
+    });
+    _this.videogeo1 = new THREE.Mesh(new THREE.ConeGeometry(widthvideo, heightvideo, 5), _this.videomat);
+    _this.videogeo1.position.z = -room_z + 5;
+    _this.videogeo1.position.x = -room_x + 5;
+    _this.videogeo1.position.y = 4.55;
+    _this.videogeo1.rotation.y = -Math.PI / 2;
+    _this.scene.add(_this.videogeo1);
 
     // texto de sala
     var roomtext = 'http://localhost:3000/art/texto1.jpg';
     var widthtext = 2;
     var heighttext = 2;
     var text1 = new THREE.TextureLoader().load(roomtext);
-    getRatio(roomtext, function (width, height) {
-      ratio = height / width;
-      heighttext = widthtext * ratio;
-    });
     _this.textmat = new THREE.MeshBasicMaterial({
       map: text1
     });
     _this.text1 = new THREE.Mesh(new THREE.BoxGeometry(0.05, heighttext, widthtext), _this.textmat);
-    _this.text1.position.z = -4.52;
-    _this.text1.position.y = heighttext / 2;
-    _this.text1.position.x = 3;
-    _this.text1.rotation.y = -Math.PI / 2;
+    _this.text1.position.z = 0;
+    _this.text1.position.y = heighttext - 1;
+    _this.text1.position.x = room_x / 2 - 0.45;
     _this.scene.add(_this.text1);
+    var spotLighttext = new THREE.SpotLight(0xf0f0f0, 1, 100, 0.5);
+    spotLighttext.position.set(0, 2, room_z - 1);
+    spotLighttext.castShadow = true;
+    _this.scene.add(spotLighttext);
 
-    // Primer cuadro
-    var imagen1src = 'http://localhost:3000/art/art1.jpg';
-    var widthart = 2;
-    var heightart = 2;
-    var imagen1 = new THREE.TextureLoader().load(imagen1src);
-    getRatio(imagen1src, function (width, height) {
-      ratio = height / width;
-      heightart = widthart * ratio;
-    });
-    _this.artmat1 = new THREE.MeshBasicMaterial({
-      map: imagen1
-    });
-    _this.arte1 = new THREE.Mesh(new THREE.BoxGeometry(0.05, heightart, widthart), _this.artmat1);
-    _this.arte1.position.z = 0;
-    _this.arte1.position.y = heightart / 2;
-    _this.arte1.position.x = 4.5;
-    _this.scene.add(_this.arte1);
-
-    // pleca de cuadro
-    var plecasrc = 'http://localhost:3000/art/pleca1.png';
-    var pleca = new THREE.TextureLoader().load(plecasrc);
-    _this.plecamat = new THREE.MeshBasicMaterial({ map: pleca });
-    _this.pleca1 = new THREE.Mesh(new THREE.BoxGeometry(0.01, 0.1, 0.2), _this.plecamat);
-    _this.pleca1.position.z = widthart / 1.5;;
-    _this.pleca1.position.y = heightart / 5;;
-    _this.pleca1.position.x = 4.5;
-    _this.scene.add(_this.pleca1);
-
-    // video cuadro
-    var videocuadro = document.getElementById('video');
-    var widthvideo = 4;
-    var heightvideo = 2;
-    var videotxt = new THREE.VideoTexture(video);
-    videotxt.minFilter = THREE.LinearFilter;
-    videotxt.magFilter = THREE.LinearFilter;
-    videotxt.format = THREE.RGBFormat;
-    _this.videomat = new THREE.MeshBasicMaterial({
-      map: videotxt
-    });
-    _this.videogeo1 = new THREE.Mesh(new THREE.BoxGeometry(0.05, heightvideo, widthvideo), _this.videomat);
-    _this.videogeo1.position.z = 4.5;
-    _this.videogeo1.position.y = heightvideo / 2;
-    _this.videogeo1.position.x = 0;
-    _this.videogeo1.rotation.y = -Math.PI / 2;
-    _this.scene.add(_this.videogeo1);
-
-    //Create the walls////
-    _this.wallGroup = new THREE.Group();
-    _this.scene.add(_this.wallGroup);
-
-    _this.wall1 = new THREE.Mesh(new THREE.BoxGeometry(10, 5, 1), new THREE.MeshLambertMaterial({
-      color: 0xFFFFFF
-    }));
-    _this.wall2 = new THREE.Mesh(new THREE.BoxGeometry(10, 5, 1), new THREE.MeshLambertMaterial({
-      color: 0xFFFFFF
-    }));
-    _this.wall3 = new THREE.Mesh(new THREE.BoxGeometry(7, 5, 1), new THREE.MeshLambertMaterial({
-      color: 0xFFFFFF
-    }));
-    _this.wall4 = new THREE.Mesh(new THREE.BoxGeometry(10, 5, 1), new THREE.MeshLambertMaterial({
-      color: 0x151515
-    }));
-
-    _this.wallGroup.add(_this.wall1, _this.wall2, _this.wall3, _this.wall4);
-    _this.wallGroup.position.y = 0;
-    _this.wall1.position.z = -5;
-    _this.wall2.position.x = -5;
-    _this.wall2.rotation.y = Math.PI / 2;
-    _this.wall3.position.x = 5;
-    _this.wall3.rotation.y = -Math.PI / 2;
-    _this.wall4.position.z = 5;
-    _this.wall4.rotation.y = Math.PI;
-
-    for (var i = 0; i < _this.wallGroup.children.length; i++) {
-      _this.wallGroup.children[i].BBox = new THREE.Box3();
-      _this.wallGroup.children[i].BBox.setFromObject(_this.wallGroup.children[i]);
-    }
-
-    //Ceiling//
-    _this.ceilMaterial = new THREE.MeshLambertMaterial({
-      color: 0xebf0f4,
-      opacity: 0.85,
-      transparent: true
-    });
-    _this.ceil = new THREE.Mesh(new THREE.BoxGeometry(10, 10, 0.1), _this.ceilMaterial);
-    _this.ceil.position.y = 2.5;
-    _this.ceil.rotation.x = Math.PI / 2;
-    _this.scene.add(_this.ceil);
-
-    //Floor//
-    var txture = new THREE.TextureLoader().load('http://localhost:3000/dw.jpg', function (txture) {
-      txture.wrapS = THREE.RepeatWrapping;
-      txture.wrapT = THREE.RepeatWrapping;
-      txture.repeat.x = 25;
-      txture.repeat.y = 50;
+    /* Floor create */
+    var floor_texture = new THREE.TextureLoader().load('http://localhost:3000/img/darkwood.jpg', function (floor_texture) {
+      floor_texture.wrapS = THREE.RepeatWrapping;
+      floor_texture.wrapT = THREE.RepeatWrapping;
+      floor_texture.repeat.x = 50;
+      floor_texture.repeat.y = 50;
     });
     _this.floorMaterial = new THREE.MeshBasicMaterial({
-      map: txture,
-      side: THREE.DoubleSide
+      map: floor_texture
     });
-    _this.floor = new THREE.Mesh(new THREE.BoxGeometry(22, 22, 1), _this.floorMaterial);
+    _this.floor = new THREE.Mesh(new THREE.BoxGeometry(room_x + 20, room_z + 20, 1), _this.floorMaterial);
     _this.floor.position.y = -1;
     _this.floor.rotation.x = Math.PI / 2;
     _this.scene.add(_this.floor);
+    /* finish floor  */
 
     _this.clock = new THREE.Clock();
 
     _this.update();
-
     return _this;
   }
 
