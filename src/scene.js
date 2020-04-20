@@ -84,20 +84,20 @@ class Scene extends EventEmitter {
 
     // Room variables
     var room_x = 10;
-    var room_z = 15;
+    var room_z = 5;
     var room_y = 8;
 
 
 
     // Inserta cuadros
-    var artworks = ['http://localhost:3000/art/art1.png', 'http://localhost:3000/art/art2.png', 'http://localhost:3000/art/art3.png'];
+    var artworks = ['http://localhost:3000/art/art1.png', 'http://localhost:3000/art/art2.png', 'http://localhost:3000/art/art3.png', 'http://localhost:3000/art/art4.png', 'http://localhost:3000/art/art5.png', 'http://localhost:3000/art/art1.jpg', 'http://localhost:3000/art/art1.png', 'http://localhost:3000/art/art4.png', 'http://localhost:3000/art/art1.png'];
 
     var widthart = 2;
     var heightart = 2;
     var eye_seight = 0.5;
     var ratio = 1;
 
-    for (var i = 0; i < 3; i++) {
+    for (var i = 0; i < 12; i++) {
       var imagen1src = artworks[i];
       var imagen1 = new THREE.TextureLoader().load(imagen1src, function ( tex ) {
         ratio = tex.image.width / tex.image.height;
@@ -107,35 +107,23 @@ class Scene extends EventEmitter {
         map: imagen1
       });
       this.arte1 = new THREE.Mesh(new THREE.BoxGeometry(0.05, heightart, widthart), this.artmat1);
-      this.arte1.position.z = room_z - 2.5;
-      this.arte1.position.y = eye_seight;
-      this.arte1.rotation.y = -Math.PI / 2;
-      this.arte1.position.x = -room_x + ((widthart + 0.5) * i);
+        this.arte1.position.z = room_z;
+        this.arte1.position.y = eye_seight;
+        this.arte1.rotation.y = -Math.PI / 0.5;
+        this.arte1.position.x = room_x*0.1 + ((widthart + 0.5) * i);
       this.scene.add(this.arte1);
-      // pleca de cuadro
-      var plecasrc = 'http://localhost:3000/art/pleca1.png';
-      var pleca = new THREE.TextureLoader().load(plecasrc);
-      this.plecamat = new THREE.MeshBasicMaterial({
-        map: pleca
-      });
-      this.pleca1 = new THREE.Mesh(new THREE.BoxGeometry(0.01, 0.1, 0.2), this.plecamat);
-      this.pleca1.position.z = room_z - 2.5;
-      this.pleca1.position.y = eye_seight;
-      this.pleca1.rotation.y = -Math.PI / 2;
-      this.pleca1.position.x = -((room_x / 2)) + ((widthart + 0.5) * i);
-      this.scene.add(this.pleca1);
     }
 
 
 
 
+    // Inserta cuadros
 
 
-    // video cuadro
     var videocuadro = document.getElementById('video');
-    var widthvideo = 5;
-    var heightvideo = 10;
-    var videotxt = new THREE.VideoTexture(video);
+    var widthvideo = 12;
+    var heightvideo = 6;
+    var videotxt = new THREE.VideoTexture(videocuadro);
     videotxt.minFilter = THREE.LinearFilter;
     videotxt.magFilter = THREE.LinearFilter;
     videotxt.format = THREE.RGBFormat;
@@ -143,38 +131,46 @@ class Scene extends EventEmitter {
       map: videotxt,
       side: THREE.DoubleSide
     });
-    this.videogeo1 = new THREE.Mesh(new THREE.ConeGeometry(widthvideo, heightvideo, 5), this.videomat);
-    this.videogeo1.position.z = -room_z + 5;
-    this.videogeo1.position.x = -room_x + 5;
-    this.videogeo1.position.y = 4.55;
+    this.videogeo1 = new THREE.Mesh(new THREE.BoxGeometry(widthvideo, heightvideo, widthvideo), this.videomat);
+    this.videogeo1.position.z = -room_z * 2;
+    this.videogeo1.position.x = room_x * 1.5;
+    this.videogeo1.position.y = 2.55;
     this.videogeo1.rotation.y = -Math.PI / 2;
     this.scene.add(this.videogeo1);
-
-
-
-
-
-
+    /* escenario */
+    var listener = new THREE.AudioListener();
+    this.camera.add( listener );
+    var audioLoader = new THREE.AudioLoader();
+    
+    var sound1 = new THREE.PositionalAudio( listener );
+    audioLoader.load('http://localhost:3000/sounds/aldon2.mp3', function ( buffer ) {
+      sound1.setBuffer( buffer );
+      sound1.setRefDistance( 5 );
+      sound1.setVolume( 1 );
+      sound1.play();
+    } );
+    this.videogeo1.add( sound1 );
+  
 
 
     // texto de sala
     var roomtext = 'http://localhost:3000/art/texto1.jpg';
-    var widthtext = 2;
-    var heighttext = 2;
+    var widthtext = 3;
+    var heighttext = 3;
     var text1 = new THREE.TextureLoader().load(roomtext);
     this.textmat = new THREE.MeshBasicMaterial({
-      map: text1
+      map: text1,
+      side: THREE.DoubleSide
     });
-    this.text1 = new THREE.Mesh(new THREE.BoxGeometry(0.05, heighttext, widthtext), this.textmat);
+    this.text1 = new THREE.Mesh(new THREE.BoxGeometry(0.1, heighttext, widthtext), this.textmat);
     this.text1.position.z = 0;
-    this.text1.position.y = heighttext - 1;
-    this.text1.position.x = (room_x/2) - 0.45;
+    this.text1.position.y = 1;
+    this.text1.position.x = room_x;
     this.scene.add(this.text1);
     var spotLighttext = new THREE.SpotLight(0xf0f0f0, 1, 100, 0.5);
     spotLighttext.position.set(0, 2, room_z - 1);
     spotLighttext.castShadow = true;
     this.scene.add(spotLighttext);
-
 
 
 
@@ -199,8 +195,9 @@ class Scene extends EventEmitter {
     this.floorMaterial = new THREE.MeshBasicMaterial({
       map: floor_texture
     });
-    this.floor = new THREE.Mesh(new THREE.BoxGeometry(room_x + 20, room_z + 20, 1), this.floorMaterial);
+    this.floor = new THREE.Mesh(new THREE.BoxGeometry(room_x + 50, room_z + 50, 1), this.floorMaterial);
     this.floor.position.y = -1;
+    this.floor.position.x = 20;
     this.floor.rotation.x = Math.PI / 2;
     this.scene.add(this.floor);
     /* finish floor  */
