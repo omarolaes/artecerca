@@ -18,6 +18,25 @@ class Scene extends EventEmitter {
     super();
     this.scene = new THREE.Scene();
 
+    var raycaster = new THREE.Raycaster(); // Needed for object intersection
+    var mouse = new THREE.Vector2(); //Needed for mouse coordinates
+// Define Geometry
+var geometry = new THREE.BoxGeometry(1, 1, 1);
+var material = new THREE.MeshPhongMaterial({ // Required For Shadows
+  color: 0xecebec,
+  specular: 0x000000,
+  shininess: 100
+});
+var cube = new THREE.Mesh(geometry, material);
+cube.position.y = 0.5;
+cube.castShadow = true;
+cube.receiveShadow = true;
+this.scene.add(cube);
+
+
+
+
+
     /* Fog */
     var fogColor = new THREE.Color(0xFFFFFF);
     this.scene.background = fogColor;
@@ -72,13 +91,9 @@ class Scene extends EventEmitter {
     domElement.addEventListener('mouseleave', e => this.onLeaveCanvas(e), false);
     window.addEventListener('keydown', e => this.onKeyDown(e), false);
 
-
     // Ambient Light in Gray
     this.worldLight = new THREE.AmbientLight(0xf0f0f0);
     this.scene.add(this.worldLight);
-
-
-
 
 
 
@@ -110,19 +125,42 @@ class Scene extends EventEmitter {
         this.arte1.position.z = room_z;
         this.arte1.position.y = eye_seight;
         this.arte1.rotation.y = -Math.PI / 0.5;
-        this.arte1.position.x = room_x*0.1 + ((widthart + 0.5) * i);
+        this.arte1.position.x = (room_x/2) + ((widthart + 0.5) * i);
       this.scene.add(this.arte1);
     }
+
+
+// raycast
+window.addEventListener('click', onDocumentMouseDown, false);
+
+function onDocumentMouseDown(event) {
+
+  // Welcome to the exciting world of raycasting !
+  // First let's get some mouse coordinates:
+  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+  // This is basically converting 2d coordinates to 3d Space:
+  raycaster.setFromCamera(mouse, this.camera);
+  // And checking if it intersects with an array object
+  var intersects = raycaster.intersectObjects([cube]);
+  
+  // does your cursor intersect the object on click ? 
+  //console.log(intersects.length > 0 ? "yes" : "no");
+  
+  // And finally change the color:
+  if (intersects.length > 0) {
+    intersects[0].object.material.color.setHex(Math.random() * 0xffffff);
+  }
+}
+
 
 
 
 
     // Inserta cuadros
-
-
     var videocuadro = document.getElementById('video');
-    var widthvideo = 12;
-    var heightvideo = 6;
+    var widthvideo = 8;
+    var heightvideo = 4;
     var videotxt = new THREE.VideoTexture(videocuadro);
     videotxt.minFilter = THREE.LinearFilter;
     videotxt.magFilter = THREE.LinearFilter;
@@ -134,7 +172,7 @@ class Scene extends EventEmitter {
     this.videogeo1 = new THREE.Mesh(new THREE.BoxGeometry(widthvideo, heightvideo, widthvideo), this.videomat);
     this.videogeo1.position.z = -room_z * 2;
     this.videogeo1.position.x = room_x * 1.5;
-    this.videogeo1.position.y = 2.55;
+    this.videogeo1.position.y = 1.55;
     this.videogeo1.rotation.y = -Math.PI / 2;
     this.scene.add(this.videogeo1);
     /* escenario */
@@ -143,10 +181,10 @@ class Scene extends EventEmitter {
     var audioLoader = new THREE.AudioLoader();
     
     var sound1 = new THREE.PositionalAudio( listener );
-    audioLoader.load('http://localhost:3000/sounds/aldon2.mp3', function ( buffer ) {
+    audioLoader.load('http://localhost:3000/sounds/aldon.mp3', function ( buffer ) {
       sound1.setBuffer( buffer );
-      sound1.setRefDistance( 5 );
-      sound1.setVolume( 1 );
+      sound1.setRefDistance(1);
+      sound1.setVolume( 0 );
       sound1.play();
     } );
     this.videogeo1.add( sound1 );
@@ -154,34 +192,23 @@ class Scene extends EventEmitter {
 
 
     // texto de sala
-    var roomtext = 'http://localhost:3000/art/texto1.jpg';
+    var roomtext = 'http://localhost:3000/art/texto1.png';
     var widthtext = 3;
-    var heighttext = 3;
+    var heighttext = 5;
     var text1 = new THREE.TextureLoader().load(roomtext);
     this.textmat = new THREE.MeshBasicMaterial({
       map: text1,
       side: THREE.DoubleSide
     });
-    this.text1 = new THREE.Mesh(new THREE.BoxGeometry(0.1, heighttext, widthtext), this.textmat);
+    this.text1 = new THREE.Mesh(new THREE.BoxGeometry(widthtext, heighttext, widthtext), this.textmat);
     this.text1.position.z = 0;
-    this.text1.position.y = 1;
+    this.text1.position.y = 2.1;
     this.text1.position.x = room_x;
     this.scene.add(this.text1);
     var spotLighttext = new THREE.SpotLight(0xf0f0f0, 1, 100, 0.5);
     spotLighttext.position.set(0, 2, room_z - 1);
     spotLighttext.castShadow = true;
     this.scene.add(spotLighttext);
-
-
-
-
-
-
-
-
-
-
-
 
 
 
