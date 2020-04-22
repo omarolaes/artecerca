@@ -152,7 +152,7 @@ class Scene extends EventEmitter {
     audioLoader.load('http://localhost:3000/sounds/aldon.mp3', function (buffer) {
       sound1.setBuffer(buffer);
       sound1.setRefDistance(1);
-      sound1.setVolume(0);
+      sound1.setVolume(1);
       sound1.play();
     });
     this.videogeo1.add(sound1);
@@ -198,19 +198,43 @@ class Scene extends EventEmitter {
       })
     });
     
-    let objLoader2 = new OBJLoader();
-      objLoader2.load('http://localhost:3000/img/head.obj', (object) => {
-      object.scale.set(2,2,2);
-      object.position.x = 20;
-      object.position.z = -8;
-      object.position.y = 15;
-        this.scene.add(object)
-    });
+   
+      let loader = new THREE.OBJLoader();
+      let url = "http://localhost:3000/img/bab.obj"
+      loader.load(
+          url,
+          object => {
+       var R = 100;
+      for (let i = 0; i < 50;) {
+          var posx = (Math.random() - 0.5) * R * 2 * Math.random();
+          var posy = -0.5;
+          var posz = (Math.random() - 0.5) * R * 2 * Math.random();
+          object = object.clone();
+          object.scale.set(0.8,0.8,0.8);
+          var material = new THREE.MeshNormalMaterial({
+            transparency: true,
+            opacity: 0.5
+          });
+          object.traverse( ( obj ) => {
+              if ( obj instanceof THREE.Mesh ) obj.material = material;
+          } );
+  object.position.set(posx, posy, posz);
+          var distance_squared = object.position.x * object.position.x + object.position.y * object.position.y + object.position.z * object.position.z;
 
-
-
-
-
+          if (distance_squared <= R * R) {
+              this.scene.add(object);
+              ++i;
+          }
+      }
+      },
+      xhr => {
+          let amount = Math.round(xhr.loaded / xhr.total * 100);
+          console.log(`${amount}% loaded`);
+      },
+      () => {
+          console.log('An error happened');
+      }
+  );
 
 
 
@@ -228,9 +252,9 @@ class Scene extends EventEmitter {
     this.floorMaterial = new THREE.MeshBasicMaterial({
       map: floor_texture
     });
-    this.floor = new THREE.Mesh(new THREE.BoxGeometry(room_x + 50, room_z + 50, 1), this.floorMaterial);
+    this.floor = new THREE.Mesh(new THREE.BoxGeometry(room_x + 100, room_z + 100, 1), this.floorMaterial);
     this.floor.position.y = -1;
-    this.floor.position.x = 20;
+    this.floor.position.x = 0;
     this.floor.rotation.x = Math.PI / 2;
     this.scene.add(this.floor);
     /* finish floor  */
