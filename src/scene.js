@@ -1,5 +1,7 @@
 //Three.js
-import * as THREE from 'three'; 
+import * as THREE from 'three';
+
+import {MTLLoader, OBJLoader} from 'three-obj-mtl-loader';
 
 import FirstPersonControls from './fpscontrols';
 FirstPersonControls(THREE);
@@ -18,20 +20,12 @@ class Scene extends EventEmitter {
     super();
     this.scene = new THREE.Scene();
 
-    var raycaster = new THREE.Raycaster(); // Needed for object intersection
-    var mouse = new THREE.Vector2(); //Needed for mouse coordinates
-// Define Geometry
-var geometry = new THREE.BoxGeometry(1, 1, 1);
-var material = new THREE.MeshPhongMaterial({ // Required For Shadows
-  color: 0xecebec,
-  specular: 0x000000,
-  shininess: 100
-});
-var cube = new THREE.Mesh(geometry, material);
-cube.position.y = 0.5;
-cube.castShadow = true;
-cube.receiveShadow = true;
-this.scene.add(cube);
+
+
+
+
+
+
 
 
 
@@ -114,46 +108,20 @@ this.scene.add(cube);
 
     for (var i = 0; i < 12; i++) {
       var imagen1src = artworks[i];
-      var imagen1 = new THREE.TextureLoader().load(imagen1src, function ( tex ) {
+      var imagen1 = new THREE.TextureLoader().load(imagen1src, function (tex) {
         ratio = tex.image.width / tex.image.height;
         heightart = widthart * ratio;
       });
       this.artmat1 = new THREE.MeshBasicMaterial({
         map: imagen1
       });
-      this.arte1 = new THREE.Mesh(new THREE.BoxGeometry(0.05, heightart, widthart), this.artmat1);
-        this.arte1.position.z = room_z;
-        this.arte1.position.y = eye_seight;
-        this.arte1.rotation.y = -Math.PI / 0.5;
-        this.arte1.position.x = (room_x/2) + ((widthart + 0.5) * i);
+      this.arte1 = new THREE.Mesh(new THREE.BoxGeometry(2, heightart, widthart), this.artmat1);
+      this.arte1.position.z = room_z;
+      this.arte1.position.y = eye_seight;
+      this.arte1.rotation.y = -Math.PI / 0.5;
+      this.arte1.position.x = (room_x / 2) + ((widthart + 0.5) * i);
       this.scene.add(this.arte1);
     }
-
-
-// raycast
-window.addEventListener('click', onDocumentMouseDown, false);
-
-function onDocumentMouseDown(event) {
-
-  // Welcome to the exciting world of raycasting !
-  // First let's get some mouse coordinates:
-  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-  // This is basically converting 2d coordinates to 3d Space:
-  raycaster.setFromCamera(mouse, this.camera);
-  // And checking if it intersects with an array object
-  var intersects = raycaster.intersectObjects([cube]);
-  
-  // does your cursor intersect the object on click ? 
-  //console.log(intersects.length > 0 ? "yes" : "no");
-  
-  // And finally change the color:
-  if (intersects.length > 0) {
-    intersects[0].object.material.color.setHex(Math.random() * 0xffffff);
-  }
-}
-
-
 
 
 
@@ -177,18 +145,18 @@ function onDocumentMouseDown(event) {
     this.scene.add(this.videogeo1);
     /* escenario */
     var listener = new THREE.AudioListener();
-    this.camera.add( listener );
+    this.camera.add(listener);
     var audioLoader = new THREE.AudioLoader();
-    
-    var sound1 = new THREE.PositionalAudio( listener );
-    audioLoader.load('http://localhost:3000/sounds/aldon.mp3', function ( buffer ) {
-      sound1.setBuffer( buffer );
+
+    var sound1 = new THREE.PositionalAudio(listener);
+    audioLoader.load('http://localhost:3000/sounds/aldon.mp3', function (buffer) {
+      sound1.setBuffer(buffer);
       sound1.setRefDistance(1);
-      sound1.setVolume( 0 );
+      sound1.setVolume(0);
       sound1.play();
-    } );
-    this.videogeo1.add( sound1 );
-  
+    });
+    this.videogeo1.add(sound1);
+
 
 
     // texto de sala
@@ -209,6 +177,44 @@ function onDocumentMouseDown(event) {
     spotLighttext.position.set(0, 2, room_z - 1);
     spotLighttext.castShadow = true;
     this.scene.add(spotLighttext);
+
+
+
+
+
+
+
+    let mtlLoader = new MTLLoader();
+    let objLoader = new OBJLoader();
+    mtlLoader.load('http://localhost:3000/img/bab.mtl', (materials) => {
+      materials.preload()
+      objLoader.setMaterials(materials)
+      objLoader.load('http://localhost:3000/img/bab.obj', (object) => {
+      object.scale.set(0.5,0.5,0.5);
+      object.position.x = 8;
+      object.position.z = -5;
+      object.position.y = -1;
+        this.scene.add(object)
+      })
+    });
+    
+    let objLoader2 = new OBJLoader();
+      objLoader2.load('http://localhost:3000/img/head.obj', (object) => {
+      object.scale.set(2,2,2);
+      object.position.x = 20;
+      object.position.z = -8;
+      object.position.y = 15;
+        this.scene.add(object)
+    });
+
+
+
+
+
+
+
+
+
 
 
 
