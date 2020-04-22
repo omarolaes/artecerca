@@ -48061,7 +48061,7 @@ var Scene = function (_EventEmitter) {
     _this.scene = new THREE.Scene();
 
     /* Fog */
-    var fogColor = new THREE.Color(0xFFFFFF);
+    var fogColor = new THREE.Color(0x000000);
     _this.scene.background = fogColor;
     _this.scene.fog = new THREE.Fog(fogColor, 0.00025, 100);
 
@@ -48175,7 +48175,7 @@ var Scene = function (_EventEmitter) {
     var audioLoader = new THREE.AudioLoader();
 
     var sound1 = new THREE.PositionalAudio(listener);
-    audioLoader.load('http://localhost:3000/sounds/aldon.mp3', function (buffer) {
+    audioLoader.load('http://localhost:3000/art/joint.mp3', function (buffer) {
       sound1.setBuffer(buffer);
       sound1.setRefDistance(1);
       sound1.setVolume(1);
@@ -48216,9 +48216,9 @@ var Scene = function (_EventEmitter) {
       });
     });
 
-    var loader = new THREE.OBJLoader();
+    // loop trees
     var url = "http://localhost:3000/img/bab.obj";
-    loader.load(url, function (object) {
+    objLoader.load(url, function (object) {
       var R = 100;
       for (var _i = 0; _i < 50;) {
         var posx = (Math.random() - 0.5) * R * 2 * Math.random();
@@ -48226,12 +48226,13 @@ var Scene = function (_EventEmitter) {
         var posz = (Math.random() - 0.5) * R * 2 * Math.random();
         object = object.clone();
         object.scale.set(0.8, 0.8, 0.8);
-        var material = new THREE.MeshNormalMaterial({
-          transparency: true,
+        var material = new THREE.MeshPhongMaterial({
+          color: 0x000000,
+          transparent: true,
           opacity: 0.5
         });
         object.traverse(function (obj) {
-          if (obj instanceof THREE.Mesh) obj.material = material;
+          if (obj instanceof THREE.Mesh) obj.material = _this.videomat;
         });
         object.position.set(posx, posy, posz);
         var distance_squared = object.position.x * object.position.x + object.position.y * object.position.y + object.position.z * object.position.z;
