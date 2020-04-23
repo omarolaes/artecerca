@@ -47925,7 +47925,7 @@ glScene.on('userMoved', function () {
 //On connection server sends the client his ID
 socket.on('introduction', function (_id, _clientNum, _ids) {
 
-  var geometry = new THREE.SphereBufferGeometry(0.1, 5, 5);
+  var geometry = new THREE.BoxGeometry(0.5, 1, 0.5);
   var material = new THREE.MeshNormalMaterial();
 
   for (var i = 0; i < _ids.length; i++) {
@@ -47954,7 +47954,7 @@ socket.on('newUserConnected', function (clientCount, _id, _ids) {
     }
   }
   if (_id != id && !alreadyHasUser) {
-    var geometry = new THREE.SphereBufferGeometry(0.1, 5, 5);
+    var geometry = new THREE.BoxGeometry(0.5, 1, 0.5);
     var material = new THREE.MeshNormalMaterial();
     console.log('Nuevo: ' + _id);
     clients[_id] = {
@@ -48101,6 +48101,7 @@ var Scene = function (_EventEmitter) {
     if (hasControls) {
       _this.controls = new THREE.FirstPersonControls(_this.camera, _this.renderer.domElement);
       _this.controls.lookSpeed = 0.08;
+      _this.controls.movementSpeed = 2;
     }
 
     // Setup event listeners for events and handle the states
@@ -48175,10 +48176,10 @@ var Scene = function (_EventEmitter) {
     var audioLoader = new THREE.AudioLoader();
 
     var sound1 = new THREE.PositionalAudio(listener);
-    audioLoader.load('http://localhost:3000/art/joint.mp3', function (buffer) {
+    audioLoader.load('http://localhost:3000/art/noami.mp3', function (buffer) {
       sound1.setBuffer(buffer);
       sound1.setRefDistance(1);
-      sound1.setVolume(1);
+      sound1.setVolume(0);
       sound1.play();
     });
     _this.videogeo1.add(sound1);
@@ -48202,52 +48203,61 @@ var Scene = function (_EventEmitter) {
     spotLighttext.castShadow = true;
     _this.scene.add(spotLighttext);
 
-    var mtlLoader = new _threeObjMtlLoader.MTLLoader();
-    var objLoader = new _threeObjMtlLoader.OBJLoader();
-    mtlLoader.load('http://localhost:3000/img/bab.mtl', function (materials) {
-      materials.preload();
-      objLoader.setMaterials(materials);
-      objLoader.load('http://localhost:3000/img/bab.obj', function (object) {
-        object.scale.set(0.5, 0.5, 0.5);
-        object.position.x = 8;
-        object.position.z = -5;
-        object.position.y = -1;
-        _this.scene.add(object);
-      });
-    });
-
-    // loop trees
-    var url = "http://localhost:3000/img/bab.obj";
-    objLoader.load(url, function (object) {
-      var R = 100;
-      for (var _i = 0; _i < 50;) {
-        var posx = (Math.random() - 0.5) * R * 2 * Math.random();
-        var posy = -0.5;
-        var posz = (Math.random() - 0.5) * R * 2 * Math.random();
-        object = object.clone();
-        object.scale.set(0.8, 0.8, 0.8);
-        var material = new THREE.MeshPhongMaterial({
-          color: 0x000000,
-          transparent: true,
-          opacity: 0.5
+    /*
+        let mtlLoader = new MTLLoader();
+        mtlLoader.load('http://localhost:3000/img/chapel.mtl', (materials) => {
+          materials.preload()
+          objLoader.setMaterials(materials)
+          objLoader.load('http://localhost:3000/img/chapel.obj', (object) => {
+          object.scale.set(0.01,0.01,0.01);
+          object.position.x = 10;
+          object.position.z = 5;
+          object.position.y = -1;
+            this.scene.add(object)
+          })
         });
-        object.traverse(function (obj) {
-          if (obj instanceof THREE.Mesh) obj.material = _this.videomat;
-        });
-        object.position.set(posx, posy, posz);
-        var distance_squared = object.position.x * object.position.x + object.position.y * object.position.y + object.position.z * object.position.z;
-
-        if (distance_squared <= R * R) {
-          _this.scene.add(object);
-          ++_i;
-        }
-      }
-    }, function (xhr) {
-      var amount = Math.round(xhr.loaded / xhr.total * 100);
-      console.log(amount + '% loaded');
-    }, function () {
-      console.log('An error happened');
-    });
+    
+    
+    
+       let objLoader = new OBJLoader();
+        // loop trees
+          let url = "http://localhost:3000/img/chapel.obj"
+          objLoader.load(
+              url,
+              object => {
+           var R = 100;
+          for (let i = 0; i < 50;) {
+              var posx = (Math.random() - 0.5) * R * 2 * Math.random();
+              var posy = -0.5;
+              var posz = (Math.random() - 0.5) * R * 2 * Math.random();
+              object = object.clone();
+              object.scale.set(0.003,0.003,0.003);
+              var material = new THREE.MeshPhongMaterial({
+                color: 0x000000,
+                transparent: true,
+                opacity: 0.5
+              });
+              object.traverse( ( obj ) => {
+                  if ( obj instanceof THREE.Mesh ) obj.material =  this.videomat;
+              } );
+      object.position.set(posx, posy, posz);
+              var distance_squared = object.position.x * object.position.x + object.position.y * object.position.y + object.position.z * object.position.z;
+    
+              if (distance_squared <= R * R) {
+                  this.scene.add(object);
+                  ++i;
+              }
+          }
+          },
+          xhr => {
+              let amount = Math.round(xhr.loaded / xhr.total * 100);
+              console.log(`${amount}% loaded`);
+          },
+          () => {
+              console.log('An error happened');
+          }
+      );
+        */
 
     /* Floor create */
     var floor_texture = new THREE.TextureLoader().load('http://localhost:3000/img/darkwood.jpg', function (floor_texture) {

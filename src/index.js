@@ -23,7 +23,7 @@ glScene.on('userMoved', ()=>{
 //On connection server sends the client his ID
 socket.on('introduction', (_id, _clientNum, _ids)=>{
   
-  var geometry = new THREE.SphereBufferGeometry( 0.1, 5, 5 );
+  var geometry = new THREE.BoxGeometry( 0.5, 1, 0.5 );
   var material = new THREE.MeshNormalMaterial();
 
   for(let i = 0; i < _ids.length; i++){
@@ -54,7 +54,7 @@ socket.on('newUserConnected', (clientCount, _id, _ids)=>{
     }
   }
   if(_id != id && !alreadyHasUser){
-    var geometry = new THREE.SphereBufferGeometry( 0.1, 5, 5 );
+    var geometry = new THREE.BoxGeometry( 0.5, 1, 0.5 );
     var material = new THREE.MeshNormalMaterial();
     console.log('Nuevo: ' + _id);
     clients[_id] = {

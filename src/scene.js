@@ -77,6 +77,7 @@ class Scene extends EventEmitter {
     if (hasControls) {
       this.controls = new THREE.FirstPersonControls(this.camera, this.renderer.domElement);
       this.controls.lookSpeed = 0.08;
+      this.controls.movementSpeed = 2;
     }
 
     // Setup event listeners for events and handle the states
@@ -149,10 +150,10 @@ class Scene extends EventEmitter {
     var audioLoader = new THREE.AudioLoader();
 
     var sound1 = new THREE.PositionalAudio(listener);
-    audioLoader.load('http://localhost:3000/art/joint.mp3', function (buffer) {
+    audioLoader.load('http://localhost:3000/art/noami.mp3', function (buffer) {
       sound1.setBuffer(buffer);
       sound1.setRefDistance(1);
-      sound1.setVolume(1);
+      sound1.setVolume(0);
       sound1.play();
     });
     this.videogeo1.add(sound1);
@@ -183,26 +184,25 @@ class Scene extends EventEmitter {
 
 
 
-
+/*
     let mtlLoader = new MTLLoader();
-    let objLoader = new OBJLoader();
-    mtlLoader.load('http://localhost:3000/img/bab.mtl', (materials) => {
+    mtlLoader.load('http://localhost:3000/img/chapel.mtl', (materials) => {
       materials.preload()
       objLoader.setMaterials(materials)
-      objLoader.load('http://localhost:3000/img/bab.obj', (object) => {
-      object.scale.set(0.5,0.5,0.5);
-      object.position.x = 8;
-      object.position.z = -5;
+      objLoader.load('http://localhost:3000/img/chapel.obj', (object) => {
+      object.scale.set(0.01,0.01,0.01);
+      object.position.x = 10;
+      object.position.z = 5;
       object.position.y = -1;
         this.scene.add(object)
       })
     });
-    
 
 
 
+   let objLoader = new OBJLoader();
     // loop trees
-      let url = "http://localhost:3000/img/bab.obj"
+      let url = "http://localhost:3000/img/chapel.obj"
       objLoader.load(
           url,
           object => {
@@ -212,7 +212,7 @@ class Scene extends EventEmitter {
           var posy = -0.5;
           var posz = (Math.random() - 0.5) * R * 2 * Math.random();
           object = object.clone();
-          object.scale.set(0.8,0.8,0.8);
+          object.scale.set(0.003,0.003,0.003);
           var material = new THREE.MeshPhongMaterial({
             color: 0x000000,
             transparent: true,
@@ -238,6 +238,7 @@ class Scene extends EventEmitter {
           console.log('An error happened');
       }
   );
+    */
 
 
 
